@@ -28,6 +28,7 @@ func main() {
 
   router.HandleFunc("/is_closed", isClosedHandler).Methods("GET")
   router.HandleFunc("/members", membersHandler).Methods("GET")
+  router.HandleFunc("/stream", streamHandler).Methods("GET")
 
   log.Printf("serving on port %d", *port)
   log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *port), router))
