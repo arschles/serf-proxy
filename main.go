@@ -26,47 +26,47 @@ func main() {
 	}
 	router := mux.NewRouter()
 
-  //rpcClient.Leave()
-  router.HandleFunc("/membership", deleteMembershipHandler).Methods("DELETE")
-  //rpcClient.ForceLeave()
-  router.HandleFunc("/membership", forceDeleteMembershipHandler).Methods("DELETE").Queries("node", "")
-  //rpcClient.Join(addrs, replay)
-  router.HandleFunc("/membership", joinMembershipHandler).Methods("POST").Queries("replay", "")
-  //rpcClient.Members
-  router.HandleFunc("/membership", getMembersHandler).Methods("GET")
+	//rpcClient.Leave()
+	router.HandleFunc("/membership", deleteMembershipHandler).Methods("DELETE")
+	//rpcClient.ForceLeave()
+	router.HandleFunc("/membership", forceDeleteMembershipHandler).Methods("DELETE").Queries("node", "")
+	//rpcClient.Join(addrs, replay)
+	router.HandleFunc("/membership", joinMembershipHandler).Methods("POST").Queries("replay", "")
+	//rpcClient.Members
+	router.HandleFunc("/membership", getMembersHandler).Methods("GET")
 
-  //rpcClient.ListKeys()
-  router.HandleFunc("/keys", keysHandler).Methods("GET")
+	//rpcClient.ListKeys()
+	router.HandleFunc("/keys", keysHandler).Methods("GET")
 
-  //rpcClient.MembersFiltered
-  //TODO
+	//rpcClient.MembersFiltered
+	//TODO
 
-  //rpcClient.Monitor
-  //TODO
+	//rpcClient.Monitor
+	//TODO
 
-  //rpcClient.Query
-  //TODO
+	//rpcClient.Query
+	//TODO
 
-  //rpcClient.RemoveKey
-  //TODO
+	//rpcClient.RemoveKey
+	//TODO
 
-  //rpcClient.Respond
-  //TODO
+	//rpcClient.Respond
+	//TODO
 
-  //rpcClient.Stats
+	//rpcClient.Stats
 	router.HandleFunc("/stats", statsHandler).Methods("GET")
 
-  //rpcClient.Stream
-  //TODO
+	//rpcClient.Stream
+	//TODO
 
-  //rpcClient.UpdateTags
-  router.HandleFunc("/tags", updateTagsHandler).Methods("PATCH")
+	//rpcClient.UpdateTags
+	router.HandleFunc("/tags", updateTagsHandler).Methods("PATCH")
 
-  //rpcClient.UseKey
-  router.HandleFunc("/keys", useKeyHandler).Methods("PUT").Queries("key", "")
+	//rpcClient.UseKey
+	router.HandleFunc("/keys", useKeyHandler).Methods("PUT").Queries("key", "")
 
-  //rpcClient.UserEvent
-  router.HandleFunc("/event", triggerUserEventHandler).Methods("POST").Queries("coalesce", "")
+	//rpcClient.UserEvent
+	router.HandleFunc("/event", triggerUserEventHandler).Methods("POST").Queries("coalesce", "")
 
 	log.Printf("serving on port %d", *port)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *port), router))
