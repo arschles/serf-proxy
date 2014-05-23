@@ -1,8 +1,10 @@
 package main
 
-import json_encoder "encoding/json"
-import "net/http"
-import "fmt"
+import (
+  json_encoder "encoding/json"
+  "net/http"
+  "fmt"
+)
 
 func writeJson(code int, i interface{}, resp http.ResponseWriter) {
 	bytes, err := json_encoder.Marshal(i)
