@@ -17,5 +17,6 @@ func writeJson(code int, i interface{}, resp http.ResponseWriter) {
 }
 
 func writeJsonErr(code int, err error, resp http.ResponseWriter) {
-  writeJson(code, err.Error(), resp)
+  jsonStr := fmt.Sprintf(`{"error":"%s"}`, err.Error())
+  writeJson(code, jsonStr, resp)
 }
