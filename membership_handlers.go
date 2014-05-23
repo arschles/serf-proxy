@@ -6,6 +6,7 @@ import (
   "strconv"
   "encoding/json"
   "io/ioutil"
+  SerfClient "github.com/hashicorp/serf/client"
 )
 
 func deleteMembershipHandler(resp http.ResponseWriter, req *http.Request) {
@@ -17,7 +18,7 @@ func deleteMembershipHandler(resp http.ResponseWriter, req *http.Request) {
   resp.WriteHeader(http.StatusNoContent)
 }
 
-func forceDeleteMembershipHandler(resp http.ResponseWriter, req *httpRequest) {
+func forceDeleteMembershipHandler(resp http.ResponseWriter, req *http.Request) {
   node := mux.Vars(req)["node"]
   if node == "" {
     http.Error(resp, "no node in query string", http.StatusBadRequest)
@@ -25,7 +26,7 @@ func forceDeleteMembershipHandler(resp http.ResponseWriter, req *httpRequest) {
   }
   err := serfClient.ForceLeave(node)
   if err != nil {
-    http.Error(resp, err.Error, http.StatusInternalServerError)
+    http.Error(resp, err.Error(), http.StatusInternalServerError)
     return
   }
   resp.WriteHeader(http.StatusNoContent)
@@ -34,7 +35,7 @@ func forceDeleteMembershipHandler(resp http.ResponseWriter, req *httpRequest) {
 func joinMembershipHandler(resp http.ResponseWriter, req *http.Request) {
   replay, replayParseErr := strconv.ParseBool(mux.Vars(req)["replay"])
   if replayParseErr != nil {
-    http.Error(resp, err.Error(), http.StatusBadRequest)
+    http.Error(resp, replayParseErr.Error(), http.StatusBadRequest)
     return
   }
 
@@ -56,8 +57,8 @@ func joinMembershipHandler(resp http.ResponseWriter, req *http.Request) {
     return
   }
 
-  http.WriteHeader(http.StatusOK)
-  http.Write([]byte(string(i)))
+  resp.WriteHeader(http.StatusOK)
+  resp.Write([]byte(string(i)))
 }
 
 func getMembersHandler(resp http.ResponseWriter, req *http.Request) {
@@ -65,6 +66,6 @@ func getMembersHandler(resp http.ResponseWriter, req *http.Request) {
   if err != nil {
     writeJson(http.StatusInternalServerError, map[string]string{"error": err.Error()}, resp)
   } else {
-    writeJson(http.StatusOK, map[string][]client.Member{"members": members}, resp)
+    writeJson(http.StatusOK, map[string][]SerfClient.Member{"members": members}, resp)
   }
 }
