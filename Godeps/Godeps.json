@@ -1,0 +1,40 @@
+{
+	"ImportPath": "github.com/arschles/serf-proxy",
+	"GoVersion": "go1.2",
+	"Deps": [
+		{
+			"ImportPath": "github.com/armon/go-metrics",
+			"Rev": "9f6a9c50a111d7be8b8a201b0b7ee929f6cd1e91"
+		},
+		{
+			"ImportPath": "github.com/gorilla/context",
+			"Rev": "1be7a086a5fd6440ef16fe96baeda0c78282b980"
+		},
+		{
+			"ImportPath": "github.com/gorilla/mux",
+			"Rev": "136d54f81f00414c45c3c68dd47e98cc97519c5e"
+		},
+		{
+			"ImportPath": "github.com/hashicorp/logutils",
+			"Rev": "8e0820fe7ac5eb2b01626b1d99df47c5449eb2d8"
+		},
+		{
+			"ImportPath": "github.com/hashicorp/memberlist",
+			"Rev": "bcebd0d53e6b33ee06c47646a022cc824505aac8"
+		},
+		{
+			"ImportPath": "github.com/hashicorp/serf/client",
+			"Comment": "v0.5.0-129-g069de11",
+			"Rev": "069de11371079e57e7e46b3b4b42ae20c28e18ff"
+		},
+		{
+			"ImportPath": "github.com/hashicorp/serf/serf",
+			"Comment": "v0.5.0-129-g069de11",
+			"Rev": "069de11371079e57e7e46b3b4b42ae20c28e18ff"
+		},
+		{
+			"ImportPath": "github.com/ugorji/go/codec",
+			"Rev": "71c2886f5a673a35f909803f38ece5810165097b"
+		}
+	]
+}

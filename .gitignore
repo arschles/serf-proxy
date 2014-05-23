@@ -21,3 +21,6 @@ _testmain.go
 
 *.exe
 *.test
+Godeps/_workspace
+Godeps/Readme
+serf-proxy
