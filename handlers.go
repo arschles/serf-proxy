@@ -1,63 +1,43 @@
 package main
 
 import (
-  "net/http"
-  json_encoder "encoding/json"
-  "github.com/hashicorp/serf/client"
-  "fmt"
-  "log"
+	"net/http"
+  "github.com/gorilla/mux"
 )
 
-func json(code int, i interface{}, resp http.ResponseWriter) {
-  bytes, err := json_encoder.Marshal(i)
+func keysHandler(resp http.ResponseWriter, req *http.Request) {
+  keys, total, _, err := serfClient.ListKeys()
   if err != nil {
-    resp.WriteHeader(http.StatusInternalServerError)
-    str := fmt.Sprintf(`{"error":""%s"}`, err.Error())
-    resp.Write([]byte(str))
-  } else {
-    resp.WriteHeader(code)
-    resp.Write(bytes)
+    http.Error(resp, err.Error(), http.StatusInternalServerError)
+    return
   }
+  jsonMap := map[string]interface{} {"keys": keys,"total": total}
+  writeJson(http.StatusOK, jsonMap, resp)
 }
 
-func isClosedHandler(resp http.ResponseWriter, req *http.Request) {
-  m := map[string]bool{"is_closed":serfClient.IsClosed()}
-  json(http.StatusOK, m, resp)
+func statsHandler(resp http.ResponseWriter, req *http.Request) {
+  stats, err := serfClient.Stats()
+  if err != nil {
+    writeJson(http.StatusInternalServerError, map[string]string{"error": err.Error()}, resp)
+    return
+  }
+  writeJson(http.StatusOK, stats, resp)
 }
 
-func membersHandler(resp http.ResponseWriter, req *http.Request) {
-  members, err := serfClient.Members()
-  if err != nil {
-    json(http.StatusInternalServerError, map[string]string{"error":err.Error()}, resp)
-  } else {
-    json(http.StatusOK, map[string][]client.Member{"members":members}, resp)
-  }
+func updateTagsHandler(resp http.ResponseWriter, req *http.Request) {
+  //TODO
 }
 
-func streamHandler(resp http.ResponseWriter, req *http.Request) {
-  streamCh := make(chan map[string]interface{})
-  //TODO: add filter to request
-  handle, err := serfClient.Stream("*", streamCh)
-  if err != nil {
-    json(http.StatusInternalServerError, map[string]string{"error":err.Error()}, resp)
-  } else {
-    log.Printf("beginning to chunk results from stream %d", handle)
-    resp.Header().Set("Transfer-Encoding", "chunked")
-    resp.Header().Set("Content-Type", "application/octet-stream")
-    resp.Header().Set("Content-Length", "0")
-    resp.Write([]byte("hello world"))
-    /*
-    for streamed := range(streamCh) {
-      log.Printf("chunking %+v", streamed)
-      bytes, err := json_encoder.Marshal(streamed)
-      //TODO: send error to chunked resp
-      if err == nil {
-        resp.Write(bytes)
-      }
-      log.Printf("chunking succeeded")
-    }
-    log.Printf("chunking done for stream %d", handle)
-    serfClient.Stop(handle)
-    */
+func useKeyHandler(resp http.ResponseWriter, req *http.Request) {
+  key := mux.Vars(req)["key"]
+  if key == "" {
+    http.Error(resp, "invalid key", http.StatusBadRequest)
+    return
   }
+  keyRing, err := serfClient.UseKey(key)
+  if err != nil {
+    http.Error(resp, err.Error(), http.StatusInternalServerError)
+    return
+  }
+  writeJson(http.StatusOK, keyRing, resp)
 }
