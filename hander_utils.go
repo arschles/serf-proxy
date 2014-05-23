@@ -15,3 +15,7 @@ func writeJson(code int, i interface{}, resp http.ResponseWriter) {
     resp.Write(bytes)
   }
 }
+
+func writeJsonErr(code int, err error, resp http.ResponseWriter) {
+  writeJson(code, err.Error(), resp)
+}
