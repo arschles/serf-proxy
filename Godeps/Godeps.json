@@ -24,13 +24,13 @@
 		},
 		{
 			"ImportPath": "github.com/hashicorp/serf/client",
-			"Comment": "v0.5.0-129-g069de11",
-			"Rev": "069de11371079e57e7e46b3b4b42ae20c28e18ff"
+			"Comment": "v0.6.0-10-gfa7e8d4",
+			"Rev": "fa7e8d493bdfeceb0d89b357e0d6a281d2849701"
 		},
 		{
 			"ImportPath": "github.com/hashicorp/serf/serf",
-			"Comment": "v0.5.0-129-g069de11",
-			"Rev": "069de11371079e57e7e46b3b4b42ae20c28e18ff"
+			"Comment": "v0.6.0-10-gfa7e8d4",
+			"Rev": "fa7e8d493bdfeceb0d89b357e0d6a281d2849701"
 		},
 		{
 			"ImportPath": "github.com/ugorji/go/codec",
