@@ -1,10 +1,12 @@
 package main
 
-import "net/http"
-import "strconv"
-import "encoding/json"
-import "io/ioutil"
-import "github.com/gorilla/mux"
+import (
+  "net/http"
+  "strconv"
+  "encoding/json"
+  "io/ioutil"
+  "github.com/gorilla/mux"
+)
 
 type userEventRequestPayload struct {
 	name    string
