@@ -69,5 +69,9 @@ func main() {
 	router.HandleFunc("/event", triggerUserEventHandler).Methods("POST").Queries("coalesce", "")
 
 	log.Printf("serving on port %d", *port)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", *port), router))
+	addr := fmt.Sprintf(":%d", *port)
+	listenAndServeErr := http.ListenAndServe(addr, router)
+	if listenAndServeErr != nil {
+		log.Fatal(listenAndServeErr)
+	}
 }
