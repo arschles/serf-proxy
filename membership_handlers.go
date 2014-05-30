@@ -10,8 +10,8 @@ import (
 	"strconv"
 )
 
-func (baseHandler BaseHandler) deleteMembershipHandler(resp http.ResponseWriter, req *http.Request) {
-	err := serfClient.Leave()
+func (baseHandler *BaseHandler) deleteMembershipHandler(resp http.ResponseWriter, req *http.Request) {
+	err := baseHandler.client.Leave()
 	if err != nil {
 		http.Error(resp, err.Error(), http.StatusInternalServerError)
 		return
@@ -19,13 +19,13 @@ func (baseHandler BaseHandler) deleteMembershipHandler(resp http.ResponseWriter,
 	resp.WriteHeader(http.StatusNoContent)
 }
 
-func (baseHandler BaseHandler) forceDeleteMembershipHandler(resp http.ResponseWriter, req *http.Request) {
+func (baseHandler *BaseHandler) forceDeleteMembershipHandler(resp http.ResponseWriter, req *http.Request) {
 	node := mux.Vars(req)["node"]
 	if node == "" {
 		writeJsonErr(http.StatusBadRequest, fmt.Errorf("no node in query string"), resp)
 		return
 	}
-	err := serfClient.ForceLeave(node)
+	err := baseHandler.client.ForceLeave(node)
 	if err != nil {
 		writeJsonErr(http.StatusInternalServerError, err, resp)
 		return
@@ -33,7 +33,7 @@ func (baseHandler BaseHandler) forceDeleteMembershipHandler(resp http.ResponseWr
 	resp.WriteHeader(http.StatusNoContent)
 }
 
-func (baseHandler BaseHandler) joinMembershipHandler(resp http.ResponseWriter, req *http.Request) {
+func (baseHandler *BaseHandler) joinMembershipHandler(resp http.ResponseWriter, req *http.Request) {
 	replay, replayParseErr := strconv.ParseBool(mux.Vars(req)["replay"])
 	if replayParseErr != nil {
 		writeJsonErr(http.StatusBadRequest, replayParseErr, resp)
@@ -52,7 +52,7 @@ func (baseHandler BaseHandler) joinMembershipHandler(resp http.ResponseWriter, r
 		writeJsonErr(http.StatusBadRequest, addrListParseErr, resp)
 		return
 	}
-	i, joinErr := serfClient.Join(addrList, replay)
+	i, joinErr := baseHandler.client.Join(addrList, replay)
 	if joinErr != nil {
 		writeJsonErr(http.StatusInternalServerError, joinErr, resp)
 		return
@@ -62,8 +62,8 @@ func (baseHandler BaseHandler) joinMembershipHandler(resp http.ResponseWriter, r
 	resp.Write([]byte(string(i)))
 }
 
-func (baseHandler BaseHandler) getMembersHandler(resp http.ResponseWriter, req *http.Request) {
-	members, err := serfClient.Members()
+func (baseHandler *BaseHandler) getMembersHandler(resp http.ResponseWriter, req *http.Request) {
+	members, err := baseHandler.client.Members()
 	if err != nil {
 		writeJsonErr(http.StatusInternalServerError, err, resp)
 		return

@@ -5,8 +5,8 @@ import (
 	"net/http"
 )
 
-func (baseHandler BaseHandler) keysHandler(resp http.ResponseWriter, req *http.Request) {
-	keys, total, _, err := serfClient.ListKeys()
+func (baseHandler *BaseHandler) keysHandler(resp http.ResponseWriter, req *http.Request) {
+	keys, total, _, err := baseHandler.client.ListKeys()
 	if err != nil {
 		writeJsonErr(http.StatusInternalServerError, err, resp)
 		return
@@ -16,7 +16,7 @@ func (baseHandler BaseHandler) keysHandler(resp http.ResponseWriter, req *http.R
 }
 
 func (baseHandler BaseHandler) statsHandler(resp http.ResponseWriter, req *http.Request) {
-	stats, err := serfClient.Stats()
+	stats, err := baseHandler.client.Stats()
 	if err != nil {
 		writeJson(http.StatusInternalServerError, err.Error, resp)
 		return
@@ -24,17 +24,17 @@ func (baseHandler BaseHandler) statsHandler(resp http.ResponseWriter, req *http.
 	writeJson(http.StatusOK, stats, resp)
 }
 
-func (baseHandler BaseHandler) updateTagsHandler(resp http.ResponseWriter, req *http.Request) {
+func (baseHandler *BaseHandler) updateTagsHandler(resp http.ResponseWriter, req *http.Request) {
 	//TODO
 }
 
-func (baseHandler BaseHandler) useKeyHandler(resp http.ResponseWriter, req *http.Request) {
+func (baseHandler *BaseHandler) useKeyHandler(resp http.ResponseWriter, req *http.Request) {
 	key := mux.Vars(req)["key"]
 	if key == "" {
 		writeJson(http.StatusBadRequest, "invalid key", resp)
 		return
 	}
-	keyRing, err := serfClient.UseKey(key)
+	keyRing, err := baseHandler.client.UseKey(key)
 	if err != nil {
 		writeJsonErr(http.StatusInternalServerError, err, resp)
 		return

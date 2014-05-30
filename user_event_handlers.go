@@ -13,7 +13,7 @@ type userEventRequestPayload struct {
 	payload []byte
 }
 
-func (baseHandler BaseHandler) triggerUserEventHandler(resp http.ResponseWriter, req *http.Request) {
+func (baseHandler *BaseHandler) triggerUserEventHandler(resp http.ResponseWriter, req *http.Request) {
 	coalesce, err := strconv.ParseBool(mux.Vars(req)["coalesce"])
 	if err != nil {
 		http.Error(resp, "invalid coalesce flag", http.StatusBadRequest)
@@ -32,7 +32,7 @@ func (baseHandler BaseHandler) triggerUserEventHandler(resp http.ResponseWriter,
 		http.Error(resp, userEventRequestPayloadParseErr.Error(), http.StatusInternalServerError)
 		return
 	}
-	userEventErr := serfClient.UserEvent(payload.name, payload.payload, coalesce)
+	userEventErr := baseHandler.client.UserEvent(payload.name, payload.payload, coalesce)
 	if userEventErr != nil {
 		http.Error(resp, userEventErr.Error(), http.StatusInternalServerError)
 		return

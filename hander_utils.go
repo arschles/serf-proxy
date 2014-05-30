@@ -4,11 +4,10 @@ import (
 	json_encoder "encoding/json"
 	"fmt"
 	"net/http"
-	SerfClient "github.com/hashicorp/serf/client"
 )
 
 type BaseHandler struct {
-	client *SerfClient.RPCClient
+	client Client
 }
 
 func writeJson(code int, i interface{}, resp http.ResponseWriter) {
