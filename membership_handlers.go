@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-func deleteMembershipHandler(resp http.ResponseWriter, req *http.Request) {
+func (baseHandler BaseHandler) deleteMembershipHandler(resp http.ResponseWriter, req *http.Request) {
 	err := serfClient.Leave()
 	if err != nil {
 		http.Error(resp, err.Error(), http.StatusInternalServerError)
@@ -19,7 +19,7 @@ func deleteMembershipHandler(resp http.ResponseWriter, req *http.Request) {
 	resp.WriteHeader(http.StatusNoContent)
 }
 
-func forceDeleteMembershipHandler(resp http.ResponseWriter, req *http.Request) {
+func (baseHandler BaseHandler) forceDeleteMembershipHandler(resp http.ResponseWriter, req *http.Request) {
 	node := mux.Vars(req)["node"]
 	if node == "" {
 		writeJsonErr(http.StatusBadRequest, fmt.Errorf("no node in query string"), resp)
@@ -33,7 +33,7 @@ func forceDeleteMembershipHandler(resp http.ResponseWriter, req *http.Request) {
 	resp.WriteHeader(http.StatusNoContent)
 }
 
-func joinMembershipHandler(resp http.ResponseWriter, req *http.Request) {
+func (baseHandler BaseHandler) joinMembershipHandler(resp http.ResponseWriter, req *http.Request) {
 	replay, replayParseErr := strconv.ParseBool(mux.Vars(req)["replay"])
 	if replayParseErr != nil {
 		writeJsonErr(http.StatusBadRequest, replayParseErr, resp)
@@ -62,7 +62,7 @@ func joinMembershipHandler(resp http.ResponseWriter, req *http.Request) {
 	resp.Write([]byte(string(i)))
 }
 
-func getMembersHandler(resp http.ResponseWriter, req *http.Request) {
+func (baseHandler BaseHandler) getMembersHandler(resp http.ResponseWriter, req *http.Request) {
 	members, err := serfClient.Members()
 	if err != nil {
 		writeJsonErr(http.StatusInternalServerError, err, resp)

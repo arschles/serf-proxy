@@ -13,7 +13,7 @@ type userEventRequestPayload struct {
 	payload []byte
 }
 
-func triggerUserEventHandler(resp http.ResponseWriter, req *http.Request) {
+func (baseHandler BaseHandler) triggerUserEventHandler(resp http.ResponseWriter, req *http.Request) {
 	coalesce, err := strconv.ParseBool(mux.Vars(req)["coalesce"])
 	if err != nil {
 		http.Error(resp, "invalid coalesce flag", http.StatusBadRequest)

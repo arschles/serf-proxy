@@ -26,17 +26,21 @@ func main() {
 	}
 	router := mux.NewRouter()
 
+	baseHandler := BaseHandler {
+		client: serfClient,
+	}
+
 	//rpcClient.Leave()
-	router.HandleFunc("/membership", deleteMembershipHandler).Methods("DELETE")
+	router.HandleFunc("/membership", baseHandler.deleteMembershipHandler).Methods("DELETE")
 	//rpcClient.ForceLeave()
-	router.HandleFunc("/membership", forceDeleteMembershipHandler).Methods("DELETE").Queries("node", "")
+	router.HandleFunc("/membership", baseHandler.forceDeleteMembershipHandler).Methods("DELETE").Queries("node", "")
 	//rpcClient.Join(addrs, replay)
-	router.HandleFunc("/membership", joinMembershipHandler).Methods("POST").Queries("replay", "")
+	router.HandleFunc("/membership", baseHandler.joinMembershipHandler).Methods("POST").Queries("replay", "")
 	//rpcClient.Members
-	router.HandleFunc("/membership", getMembersHandler).Methods("GET")
+	router.HandleFunc("/membership", baseHandler.getMembersHandler).Methods("GET")
 
 	//rpcClient.ListKeys()
-	router.HandleFunc("/keys", keysHandler).Methods("GET")
+	router.HandleFunc("/keys", baseHandler.keysHandler).Methods("GET")
 
 	//rpcClient.MembersFiltered
 	//TODO
@@ -54,19 +58,19 @@ func main() {
 	//TODO
 
 	//rpcClient.Stats
-	router.HandleFunc("/stats", statsHandler).Methods("GET")
+	router.HandleFunc("/stats", baseHandler.statsHandler).Methods("GET")
 
 	//rpcClient.Stream
 	//TODO
 
 	//rpcClient.UpdateTags
-	router.HandleFunc("/tags", updateTagsHandler).Methods("PATCH")
+	router.HandleFunc("/tags", baseHandler.updateTagsHandler).Methods("PATCH")
 
 	//rpcClient.UseKey
-	router.HandleFunc("/keys", useKeyHandler).Methods("PUT").Queries("key", "")
+	router.HandleFunc("/keys", baseHandler.useKeyHandler).Methods("PUT").Queries("key", "")
 
 	//rpcClient.UserEvent
-	router.HandleFunc("/event", triggerUserEventHandler).Methods("POST").Queries("coalesce", "")
+	router.HandleFunc("/event", baseHandler.triggerUserEventHandler).Methods("POST").Queries("coalesce", "")
 
 	log.Printf("serving on port %d", *port)
 	addr := fmt.Sprintf(":%d", *port)
