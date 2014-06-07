@@ -12,6 +12,10 @@ type BaseHandler struct {
 	client Client
 }
 
+func NewBaseHandler(cl Client) *BaseHandler {
+	return &BaseHandler{client:cl}
+}
+
 func writeJson(code int, i interface{}, resp http.ResponseWriter) {
 	bytes, err := json_encoder.Marshal(i)
 	if err != nil {

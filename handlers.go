@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/gorilla/mux"
 	"net/http"
 )
 
@@ -29,11 +28,12 @@ func (baseHandler *BaseHandler) updateTagsHandler(resp http.ResponseWriter, req 
 }
 
 func (baseHandler *BaseHandler) useKeyHandler(resp http.ResponseWriter, req *http.Request) {
-	key := mux.Vars(req)["key"]
-	if key == "" {
+	possibleKeys := req.URL.Query()["key"]
+	if len(possibleKeys) <= 0 {
 		writeJson(http.StatusBadRequest, "invalid key", resp)
 		return
 	}
+	key := possibleKeys[0]
 	keyRing, err := baseHandler.client.UseKey(key)
 	if err != nil {
 		writeJsonErr(http.StatusInternalServerError, err, resp)
