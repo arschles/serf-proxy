@@ -60,7 +60,7 @@ func main() {
 	//TODO
 
 	//rpcClient.UpdateTags
-	router.HandleFunc("/tags", baseHandler.updateTagsHandler).Methods("PATCH")
+	//TODO
 
 	//rpcClient.UseKey
 	router.HandleFunc("/keys", baseHandler.useKeyHandler).Methods("PUT").Queries("key", "")

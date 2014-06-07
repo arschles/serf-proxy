@@ -23,10 +23,6 @@ func (baseHandler BaseHandler) statsHandler(resp http.ResponseWriter, req *http.
 	writeJson(http.StatusOK, stats, resp)
 }
 
-func (baseHandler *BaseHandler) updateTagsHandler(resp http.ResponseWriter, req *http.Request) {
-	//TODO
-}
-
 func (baseHandler *BaseHandler) useKeyHandler(resp http.ResponseWriter, req *http.Request) {
 	possibleKeys := req.URL.Query()["key"]
 	if len(possibleKeys) <= 0 {
