@@ -24,12 +24,11 @@ func (baseHandler BaseHandler) statsHandler(resp http.ResponseWriter, req *http.
 }
 
 func (baseHandler *BaseHandler) useKeyHandler(resp http.ResponseWriter, req *http.Request) {
-	possibleKeys := req.URL.Query()["key"]
-	if len(possibleKeys) <= 0 {
+	key, err := queryString(req, "key", 0)
+	if err != nil {
 		writeJson(http.StatusBadRequest, "invalid key", resp)
 		return
 	}
-	key := possibleKeys[0]
 	keyRing, err := baseHandler.client.UseKey(key)
 	if err != nil {
 		writeJsonErr(http.StatusInternalServerError, err, resp)
