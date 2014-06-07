@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/mux"
 	SerfClient "github.com/hashicorp/serf/client"
 	"io/ioutil"
 	"net/http"
@@ -20,12 +19,12 @@ func (baseHandler *BaseHandler) deleteMembershipHandler(resp http.ResponseWriter
 }
 
 func (baseHandler *BaseHandler) forceDeleteMembershipHandler(resp http.ResponseWriter, req *http.Request) {
-	node := mux.Vars(req)["node"]
-	if node == "" {
+	node, err := queryString(req, "node", 0)
+	if err != nil {
 		writeJsonErr(http.StatusBadRequest, fmt.Errorf("no node in query string"), resp)
 		return
 	}
-	err := baseHandler.client.ForceLeave(node)
+	err = baseHandler.client.ForceLeave(node)
 	if err != nil {
 		writeJsonErr(http.StatusInternalServerError, err, resp)
 		return
@@ -34,27 +33,32 @@ func (baseHandler *BaseHandler) forceDeleteMembershipHandler(resp http.ResponseW
 }
 
 func (baseHandler *BaseHandler) joinMembershipHandler(resp http.ResponseWriter, req *http.Request) {
-	replay, replayParseErr := strconv.ParseBool(mux.Vars(req)["replay"])
-	if replayParseErr != nil {
-		writeJsonErr(http.StatusBadRequest, replayParseErr, resp)
+	replayStr, err := queryString(req, "replay", 0)
+	if err != nil {
+		writeJsonErr(http.StatusBadRequest, err, resp)
+		return
+	}
+	replay, err := strconv.ParseBool(replayStr)
+	if err != nil {
+		writeJsonErr(http.StatusBadRequest, err, resp)
 		return
 	}
 
-	body, readAllErr := ioutil.ReadAll(req.Body)
-	if readAllErr != nil {
-		writeJsonErr(http.StatusBadRequest, readAllErr, resp)
+	body, err := ioutil.ReadAll(req.Body)
+	if err != nil {
+		writeJsonErr(http.StatusBadRequest, err, resp)
 		return
 	}
 
 	addrList := []string{}
-	addrListParseErr := json.Unmarshal(body, &addrList)
-	if addrListParseErr != nil {
-		writeJsonErr(http.StatusBadRequest, addrListParseErr, resp)
+	err = json.Unmarshal(body, &addrList)
+	if err != nil {
+		writeJsonErr(http.StatusBadRequest, err, resp)
 		return
 	}
-	i, joinErr := baseHandler.client.Join(addrList, replay)
-	if joinErr != nil {
-		writeJsonErr(http.StatusInternalServerError, joinErr, resp)
+	i, err := baseHandler.client.Join(addrList, replay)
+	if err != nil {
+		writeJsonErr(http.StatusInternalServerError, err, resp)
 		return
 	}
 
