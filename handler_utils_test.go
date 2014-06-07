@@ -41,3 +41,33 @@ func TestWriteJsonErr(t *testing.T) {
     })
   })
 }
+
+func TestQueryString(t *testing.T) {
+  g := Goblin(t)
+  g.Describe("queryString", func() {
+    g.It("should correctly get the right query string value when the key exists", func() {
+      req, err := http.NewRequest("GET", "http://test.com?a=b&a=c", nil)
+      g.Assert(err).Equal(nil)
+      first, err := queryString(req, "a", 0)
+      g.Assert(err).Equal(nil)
+      g.Assert(first).Equal("b")
+      second, err := queryString(req, "a", 1)
+      g.Assert(err).Equal(nil)
+      g.Assert(second).Equal("c")
+    })
+    g.It("should correctly fail if there's no key in the query string", func() {
+      req, err := http.NewRequest("GET", "http://test.com?a=b", nil)
+      g.Assert(err).Equal(nil)
+      res, err := queryString(req, "b", 0)
+      g.Assert(err != nil).IsTrue()
+      g.Assert(res).Equal("")
+    })
+    g.It("should correctly fail if there are not enough values for the key in the query string", func() {
+      req, err := http.NewRequest("GET", "http://test.com?a=b", nil)
+      g.Assert(err).Equal(nil)
+      res, err := queryString(req, "a", 1)
+      g.Assert(err != nil).IsTrue()
+      g.Assert(res).Equal("")
+    })
+  })
+}
