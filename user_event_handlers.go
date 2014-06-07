@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/gorilla/mux"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -14,7 +13,12 @@ type userEventRequestPayload struct {
 }
 
 func (baseHandler *BaseHandler) triggerUserEventHandler(resp http.ResponseWriter, req *http.Request) {
-	coalesce, err := strconv.ParseBool(mux.Vars(req)["coalesce"])
+	coalesceStr, err := queryString(req, "coalesce", 0)
+	if err != nil {
+		http.Error(resp, "missing coalesce flag", http.StatusBadRequest)
+		return
+	}
+	coalesce, err := strconv.ParseBool(coalesceStr)
 	if err != nil {
 		http.Error(resp, "invalid coalesce flag", http.StatusBadRequest)
 		return
