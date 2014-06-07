@@ -6,6 +6,8 @@ import (
 	"net/http"
 )
 
+const ErrorKey = "error"
+
 type BaseHandler struct {
 	client Client
 }
@@ -14,7 +16,7 @@ func writeJson(code int, i interface{}, resp http.ResponseWriter) {
 	bytes, err := json_encoder.Marshal(i)
 	if err != nil {
 		resp.WriteHeader(http.StatusInternalServerError)
-		str := fmt.Sprintf(`{"error":""%s"}`, err.Error())
+		str := fmt.Sprintf(`{"error":"»%s"}`, err.Error())
 		resp.Write([]byte(str))
 	} else {
 		resp.WriteHeader(code)
@@ -23,6 +25,6 @@ func writeJson(code int, i interface{}, resp http.ResponseWriter) {
 }
 
 func writeJsonErr(code int, err error, resp http.ResponseWriter) {
-	jsonStr := fmt.Sprintf(`{"error":"%s"}`, err.Error())
-	writeJson(code, jsonStr, resp)
+	errMap := map[string]string{ErrorKey:err.Error()}
+	writeJson(code, errMap, resp)
 }
