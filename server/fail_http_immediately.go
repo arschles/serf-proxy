@@ -14,7 +14,18 @@ func EmptyBody() []byte {
   return []byte{}
 }
 
-//the action that each HttpStep will take
+//the function that converts errors into HTTP response bodies
+type FailMsg func(error) []byte
+
+//a FailMsg to convert a standard error into a JSON format.
+func JsonErr() FailMsg {
+  return func(err error) []byte {
+    str := fmt.Sprintf(`{"error":"%s"}`, err.Error())
+    return []byte(str)
+  }
+}
+
+//the function to actually run each HttpStep
 type Runner func() error
 
 //a Runner to extract a value from a query string key. intended for
@@ -122,13 +133,6 @@ func EncodeJson(val interface{}, target *[]byte) Runner {
   }
 }
 
-//convert a standard error into a JSON format.
-//intended for use in HttpStep.failMsg
-func JsonErr(err error) []byte {
-  str := fmt.Sprintf(`{"error":"%s"}`, err.Error())
-  return []byte(str)
-}
-
 //a single step to run in a series to implement a server endpoint
 type HttpStep struct {
   Runner Runner
@@ -149,7 +153,7 @@ type HttpStep struct {
 //        return nil
 //      },
 //      FailCode: http.StatusInternalServerError,
-//      FailMsg: server.JsonErr
+//      FailMsg: server.JsonErr()
 //    },
 //  }
 //  NewFailImmediately(resp, steps, http.StatusOK, []byte("OK!")).Execute()

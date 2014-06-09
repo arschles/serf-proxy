@@ -13,12 +13,12 @@ func (baseHandler *BaseHandler) deleteMembershipHandler(resp http.ResponseWriter
 				return baseHandler.client.Leave()
 			},
 			FailCode: http.StatusInternalServerError,
-			FailMsg: server.JsonErr,
+			FailMsg: server.JsonErr(),
 		},
 		&server.HttpStep {
 			Runner: func() error { return baseHandler.client.Leave() },
 			FailCode: http.StatusInternalServerError,
-			FailMsg: server.JsonErr,
+			FailMsg: server.JsonErr(),
 		},
 	}
 	server.NewFailHttpImmediately(resp, steps, http.StatusNoContent, server.EmptyBody()).Execute()
@@ -31,14 +31,14 @@ func (baseHandler *BaseHandler) forceDeleteMembershipHandler(resp http.ResponseW
 		&server.HttpStep {
 			Runner: server.QueryString(req, "node", 0, &node),
 			FailCode: http.StatusBadRequest,
-			FailMsg: server.JsonErr,
+			FailMsg: server.JsonErr(),
 		},
 		&server.HttpStep {
 			Runner: func() error {
 				return baseHandler.client.ForceLeave(node)
 			},
 			FailCode: http.StatusInternalServerError,
-			FailMsg: server.JsonErr,
+			FailMsg: server.JsonErr(),
 		},
 	}
 	server.NewFailHttpImmediately(resp, steps, http.StatusNoContent, server.EmptyBody()).Execute()
@@ -52,12 +52,12 @@ func (baseHandler *BaseHandler) joinMembershipHandler(resp http.ResponseWriter, 
 		&server.HttpStep {
 			Runner: server.QueryStringParseBool(req, "replay", 0, &replay),
 			FailCode: http.StatusBadRequest,
-			FailMsg: server.JsonErr,
+			FailMsg: server.JsonErr(),
 		},
 		&server.HttpStep {
 			Runner: server.ReadJson(req, &addrList),
 			FailCode: http.StatusBadRequest,
-			FailMsg: server.JsonErr,
+			FailMsg: server.JsonErr(),
 		},
 		&server.HttpStep {
 			Runner: func() error {
@@ -69,7 +69,7 @@ func (baseHandler *BaseHandler) joinMembershipHandler(resp http.ResponseWriter, 
 				return nil
 			},
 			FailCode: http.StatusInternalServerError,
-			FailMsg: server.JsonErr,
+			FailMsg: server.JsonErr(),
 		},
 	}
 	server.NewFailHttpImmediately(resp, steps, http.StatusOK, []byte(string(joinNum))).Execute()
@@ -89,12 +89,12 @@ func (baseHandler *BaseHandler) getMembersHandler(resp http.ResponseWriter, req 
 				return nil
 			},
 			FailCode: http.StatusInternalServerError,
-			FailMsg: server.JsonErr,
+			FailMsg: server.JsonErr(),
 		},
 		&server.HttpStep {
 			Runner: server.EncodeJson(map[string][]SerfClient.Member{"members":members}, &bytes),
 			FailCode: http.StatusInternalServerError,
-			FailMsg: server.JsonErr,
+			FailMsg: server.JsonErr(),
 		},
 	}
 
