@@ -24,3 +24,4 @@ _testmain.go
 Godeps/_workspace
 Godeps/Readme
 serf-proxy
+target/
