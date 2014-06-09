@@ -1,76 +1,102 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
 	SerfClient "github.com/hashicorp/serf/client"
-	"io/ioutil"
 	"net/http"
-	"strconv"
+	"github.com/arschles/serf-proxy/server"
 )
 
 func (baseHandler *BaseHandler) deleteMembershipHandler(resp http.ResponseWriter, req *http.Request) {
-	err := baseHandler.client.Leave()
-	if err != nil {
-		http.Error(resp, err.Error(), http.StatusInternalServerError)
-		return
+	steps := []*server.HttpStep {
+		&server.HttpStep {
+			Runner: func() error {
+				return baseHandler.client.Leave()
+			},
+			FailCode: http.StatusInternalServerError,
+			FailMsg: server.JsonErr,
+		},
+		&server.HttpStep {
+			Runner: func() error { return baseHandler.client.Leave() },
+			FailCode: http.StatusInternalServerError,
+			FailMsg: server.JsonErr,
+		},
 	}
-	resp.WriteHeader(http.StatusNoContent)
+	server.NewFailHttpImmediately(resp, steps, http.StatusNoContent, server.EmptyBody()).Execute()
 }
 
 func (baseHandler *BaseHandler) forceDeleteMembershipHandler(resp http.ResponseWriter, req *http.Request) {
-	node, err := queryString(req, "node", 0)
-	if err != nil {
-		writeJsonErr(http.StatusBadRequest, fmt.Errorf("no node in query string"), resp)
-		return
+	var node string
+
+	steps := []*server.HttpStep {
+		&server.HttpStep {
+			Runner: server.QueryString(req, "node", 0, &node),
+			FailCode: http.StatusBadRequest,
+			FailMsg: server.JsonErr,
+		},
+		&server.HttpStep {
+			Runner: func() error {
+				return baseHandler.client.ForceLeave(node)
+			},
+			FailCode: http.StatusInternalServerError,
+			FailMsg: server.JsonErr,
+		},
 	}
-	err = baseHandler.client.ForceLeave(node)
-	if err != nil {
-		writeJsonErr(http.StatusInternalServerError, err, resp)
-		return
-	}
-	resp.WriteHeader(http.StatusNoContent)
+	server.NewFailHttpImmediately(resp, steps, http.StatusNoContent, server.EmptyBody()).Execute()
 }
 
 func (baseHandler *BaseHandler) joinMembershipHandler(resp http.ResponseWriter, req *http.Request) {
-	replayStr, err := queryString(req, "replay", 0)
-	if err != nil {
-		writeJsonErr(http.StatusBadRequest, err, resp)
-		return
+	var replay bool
+	var addrList []string
+	var joinNum int
+	steps := []*server.HttpStep {
+		&server.HttpStep {
+			Runner: server.QueryStringParseBool(req, "replay", 0, &replay),
+			FailCode: http.StatusBadRequest,
+			FailMsg: server.JsonErr,
+		},
+		&server.HttpStep {
+			Runner: server.ReadJson(req, &addrList),
+			FailCode: http.StatusBadRequest,
+			FailMsg: server.JsonErr,
+		},
+		&server.HttpStep {
+			Runner: func() error {
+				i, err := baseHandler.client.Join(addrList, replay)
+				if err != nil {
+					return err
+				}
+				joinNum = i
+				return nil
+			},
+			FailCode: http.StatusInternalServerError,
+			FailMsg: server.JsonErr,
+		},
 	}
-	replay, err := strconv.ParseBool(replayStr)
-	if err != nil {
-		writeJsonErr(http.StatusBadRequest, err, resp)
-		return
-	}
-
-	body, err := ioutil.ReadAll(req.Body)
-	if err != nil {
-		writeJsonErr(http.StatusBadRequest, err, resp)
-		return
-	}
-
-	addrList := []string{}
-	err = json.Unmarshal(body, &addrList)
-	if err != nil {
-		writeJsonErr(http.StatusBadRequest, err, resp)
-		return
-	}
-	i, err := baseHandler.client.Join(addrList, replay)
-	if err != nil {
-		writeJsonErr(http.StatusInternalServerError, err, resp)
-		return
-	}
-
-	resp.WriteHeader(http.StatusOK)
-	resp.Write([]byte(string(i)))
+	server.NewFailHttpImmediately(resp, steps, http.StatusOK, []byte(string(joinNum))).Execute()
 }
 
 func (baseHandler *BaseHandler) getMembersHandler(resp http.ResponseWriter, req *http.Request) {
-	members, err := baseHandler.client.Members()
-	if err != nil {
-		writeJsonErr(http.StatusInternalServerError, err, resp)
-		return
+	var members []SerfClient.Member
+	var bytes []byte
+	steps := []*server.HttpStep {
+		&server.HttpStep {
+			Runner: func() error {
+				m, err := baseHandler.client.Members()
+				if err != nil {
+					return err
+				}
+				members = m
+				return nil
+			},
+			FailCode: http.StatusInternalServerError,
+			FailMsg: server.JsonErr,
+		},
+		&server.HttpStep {
+			Runner: server.EncodeJson(map[string][]SerfClient.Member{"members":members}, &bytes),
+			FailCode: http.StatusInternalServerError,
+			FailMsg: server.JsonErr,
+		},
 	}
-	writeJson(http.StatusOK, map[string][]SerfClient.Member{"members": members}, resp)
+
+	server.NewFailHttpImmediately(resp, steps, http.StatusOK, bytes).Execute()
 }
